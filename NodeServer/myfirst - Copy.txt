@@ -1,0 +1,98 @@
+
+//var http = require('http');
+var express = require('express');
+const bodyParser = require('body-parser');
+var dateTime = require('./testFunc');
+
+var hostname = '192.168.68.70';
+var port = 3000;
+var app = express();
+var server = app.listen(port, hostname, () =>{
+    console.log(`Server running at http://${hostname}:${port}/`);
+});
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+/*
+var server = http.createServer((req, res)=>{
+    res.writeHead(200,{'Content-Type':'text/html'});
+    res.write("Current time is myFunc: " + dateTime.myDateFunc() + "</br>");
+    res.write("Current time is: " + Date() + "</br>");
+    res.write(req.url + "</br>");    
+    res.end('Hello World!');
+});
+*/
+
+/*
+server.listen(port, hostname, () =>{
+    console.log(`Server running at http://${hostname}:${port}/`);
+});
+*/
+
+
+app.post('/mydata', (req,res) => {
+   // var data = req.body.data; // your data
+    //console.log(data);
+
+    res.status(200).json({
+        message: "JSON Data received successfully"
+    });
+
+    res.writeHead(200,{'Content-Type':'text/html'});
+    res.write("Current time is: " + Date() + "</br>");   
+    res.end('Hello World!');
+});
+
+app.get('/first',(req,res) => {
+    var data = req.body.data; // your data
+    console.log(data);
+
+    //res.send('GET request to homepage');
+    /*res.send('sdf').json({
+        message: "JSON Data received successfully"
+    });*/
+    res.writeHead(200,{'Content-Type':'text/html'});
+    /*res.status(200).json({
+        message: "JSON Data received successfully"
+    });*/
+   
+    res.write("Current time is: " + Date() + "</br>");
+    res.end('Hello World!');
+});
+
+app.get('/sec',(req,res) => {
+    var data = req.body.data; // your data
+    console.log(data);
+
+    //res.send('GET request to homepage');
+    res.status(200).json({
+        message: "JSON Data received successfully"
+    });
+    //res.writeHead(200,{'Content-Type':'text/html'});
+    /*res.status(200).json({
+        message: "JSON Data received successfully"
+    });*/
+   
+   // res.write("Current time is: " + Date() + "</br>");
+   // res.end('Hello World!');
+});
+
+app.post('/pushmessage', function (req, res) {
+    var serverKey = '';//put server key here
+    var fcm = new FCM(serverKey);
+    var token = "";// put token here which user you have to send push notification
+    var message = {
+        to: token,
+        collapse_key: 'your_collapse_key',
+        notification: {title: 'hello', body: 'test'},
+        data: {my_key: 'my value', contents: "abcv/"}
+    };
+    fcm.send(message, function (err, response) {
+        if (err) {
+            res.json({status: 0, message: err});
+        } else {
+            res.json({status: 1, message: response});
+        }
+    });
+});
