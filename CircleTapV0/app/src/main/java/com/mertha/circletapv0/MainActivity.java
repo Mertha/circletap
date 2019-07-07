@@ -42,7 +42,8 @@ public class MainActivity extends AppCompatActivity {
     {
         try {
             //mSocket = IO.socket("http://chat.socket.io");
-            mSocket = IO.socket("http://192.168.68.70:3000");
+            //mSocket = IO.socket("http://192.168.68.70:3000");
+            mSocket = IO.socket("http://192.168.0.193:8888"); //home
         } catch (URISyntaxException e) {}
     }
 
@@ -50,6 +51,9 @@ public class MainActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mSocket.on("new message", onNewMessage);
+        mSocket.connect();
 
         sendButton = findViewById(R.id.buttonSend);
 
@@ -60,10 +64,9 @@ public class MainActivity extends AppCompatActivity {
         colorTest = findViewById(R.id.colorTest);
 
         mInputMessageView = findViewById(R.id.inputText);
+        mUserName = findViewById(R.id.user);
         mMessage = findViewById(R.id.message);
 
-        mSocket.on("new message", onNewMessage);
-        mSocket.connect();
 
         blueBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -110,22 +113,34 @@ public class MainActivity extends AppCompatActivity {
 
     private void attemptSend() {
         String message = mInputMessageView.getText().toString().trim();
+        String name = "Envagyok";
         if (TextUtils.isEmpty(message)) {
             return;
         }
+        String jsonName = "{\"username\":\"" + name + "\",";
+        String jsonMsg = "\"message\":\"" + message + "\"}";
+        String json = jsonName+jsonMsg;
 
-        mInputMessageView.setText("");
-        mSocket.emit("new message", message);
+        try {
+            JSONObject objJSN = new JSONObject(json);
+            Log.d("My App", objJSN.toString());
+            mInputMessageView.setText("");
+            mSocket.emit("new message", objJSN);
+        } catch (Throwable t) {
+            Log.e("My App", "Could not parse malformed JSON: \"" + json + "\"");
+        }
+
+
     }
 
-   /* private void addMessage(String username, String message){
+    private void addMessage(String username, String message){
         mUserName.setText(username);
         mMessage.setText(message);
-    }*/
-
-    private void addMessage(String message){
-        mMessage.setText(message);
     }
+
+   /* private void addMessage(String message){
+        mMessage.setText(message);
+    }*/
 
     private Emitter.Listener onNewMessage = new Emitter.Listener() {
         @Override
@@ -133,19 +148,20 @@ public class MainActivity extends AppCompatActivity {
            runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                   // JSONObject data = (JSONObject) args[0];
-                    String message = args[0].toString();
-                    //String message;
-                    /*try {
+                    JSONObject data = (JSONObject) args[0];
+                   // String message = args[0].toString();
+                    String message;
+                    String username;
+                    try {
                         username = data.getString("username");
                         message = data.getString("message");
                     } catch (JSONException e) {
                         return;
-                    }*/
+                    }
 
                     // add the message to view
-                   // addMessage(username, message);
-                    addMessage(message);
+                    addMessage(username, message);
+                    //addMessage(message);
                 }
             });
         }

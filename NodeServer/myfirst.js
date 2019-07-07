@@ -14,7 +14,7 @@ io.on('connection', function(socket){
     console.log('user disconnected');
   });
 
-  socket.on('new message', function(msg){   
+  socket.on('new message', function(msg){ 
     console.log('message: ' + msg);
     io.emit('new message', msg); //ez mindenkinek meg maganak is elkuldi
     //socket.broadcast.emit('new message',msg); //ez mindenki masnak kuldi maganak nem
@@ -22,8 +22,8 @@ io.on('connection', function(socket){
 
 });
 
-http.listen(3000, function(){
-  console.log('listening on *:3000');
+http.listen(8888, function(){
+  console.log('listening on *:8888');
 });
 
 //kell majd json
